@@ -1,0 +1,7 @@
+steps:
+  - name: 'python:3.12-slim'
+    entrypoint: 'python'
+    args: ['-m', 'http.server', '8080']
+    dir: 'python-server'
+options:
+  source: dir
