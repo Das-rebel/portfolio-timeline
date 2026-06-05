@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { caseStudies } from "@/lib/timeline-data";
 
 type Category = "revenue" | "efficiency" | "team" | "innovation" | "metrics";
@@ -56,8 +59,17 @@ export default function SelectedWork() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))", gap: "48px" }}>
           {caseStudies.map((study) => {
             const achievements = parseAchievements(study.outcome);
+            const [hovered, setHovered] = useState(false);
             return (
-              <div key={study.company}>
+              <div
+                key={study.company}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+                style={{
+                  transition: "transform 200ms ease",
+                  transform: hovered ? "translateY(-4px)" : "translateY(0)",
+                }}
+              >
                 <p style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.2em", color: "#333333", marginBottom: "16px" }}>
                   {study.company}
                 </p>

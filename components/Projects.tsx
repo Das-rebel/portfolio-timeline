@@ -57,18 +57,23 @@ async function getGitHubRepo(owner: string, repo: string): Promise<RepoData | nu
 function ProjectCard({ project, data }: { project: typeof PROJECTS[0]; data: RepoData | null }) {
   const stars = data?.stargazers_count ?? project.fallbackStars;
   const lang = data?.language ?? project.fallbackLang;
+  const [hovered, setHovered] = useState(false);
 
   return (
     <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
         background: "#0d0d0d",
-        border: "1px solid #1a1a1a",
+        border: "1px solid " + (hovered ? "#333333" : "#1a1a1a"),
         borderRadius: "8px",
         padding: "24px",
         display: "flex",
         flexDirection: "column",
         gap: "12px",
-        transition: "border-color 0.2s",
+        transition: "transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease",
+        transform: hovered ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.4)" : "none",
       }}
     >
       {/* Header row: name + stars */}
