@@ -12,6 +12,9 @@ permissions:
 
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: https://das-rebel.github.io/portfolio-timeline/
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
