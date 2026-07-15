@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { timelineData } from "@/lib/timeline-data";
 import { motion } from "framer-motion";
 import {
   IconBrandGithub, IconBrandLinkedin, IconMail, IconExternalLink,
@@ -198,8 +199,44 @@ function CompanyLogo({ company, color }: { company: string; color: string }) {
   );
 }
 
+/* ─── TOOLTIP COMPONENT ─────────────────── */
+function KBTooltip({ bullets, color }: { bullets: string[]; color: string }) {
+  return (
+    <div style={{
+      position: "absolute",
+      top: "100%",
+      left: "50%",
+      transform: "translateX(-50%)",
+      marginTop: "8px",
+      background: "#fff",
+      border: `1px solid ${color}40`,
+      borderRadius: "8px",
+      padding: "12px 16px",
+      boxShadow: `0 8px 32px ${color}25`,
+      zIndex: 100,
+      minWidth: "320px",
+      maxWidth: "480px",
+    }}>
+      <p style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: "9px", color: color, letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "8px" }}>
+        All Resume Points
+      </p>
+      <ul style={{ margin: 0, padding: "0 0 0 14px", display: "flex", flexDirection: "column", gap: "4px" }}>
+        {bullets.map((b, i) => (
+          <li key={i} style={{ fontFamily: "'DM Serif Text',serif", fontSize: "12px", lineHeight: 1.4, color: "#1f1c14" }}>
+            {b}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 /* ─── COMPONENTS ────────────────────────── */
 function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boolean; onToggle: () => void }) {
+  // Get ALL resume bullets from timelineData for this company
+  const kbBullets = timelineData.find(t => t.company === job.company)?.bullets || job.highlights;
+  const [showTooltip, setShowTooltip] = useState(false);
+
   return (
     <div
       style={{
@@ -209,10 +246,18 @@ function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boole
         marginBottom: "10px",
         background: "#faf3ea",
         transition: "box-shadow 0.25s ease",
+        position: "relative",
       }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${job.color}18`; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${job.color}18`;
+        setShowTooltip(true);
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.boxShadow = "none";
+        setShowTooltip(false);
+      }}
     >
+      {showTooltip && <KBTooltip bullets={kbBullets} color={job.color} />}
       {/* Header — always visible, clickable */}
       <button
         onClick={onToggle}

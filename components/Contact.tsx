@@ -1,96 +1,29 @@
-"use client";
-import { motion } from "framer-motion";
-import { useTheme } from "../context/ThemeContext";
-
 export default function Contact() {
-  const { colors } = useTheme();
-
   return (
-    <section id="contact" style={{ padding: "120px 24px", background: colors.background, borderTop: `1px solid ${colors.border}` }}>
-      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-        <div style={{ textAlign: "left", marginBottom: "60px" }}>
-          <h2 style={{ 
-            color: colors.textPrimary, 
-            fontSize: "64px", 
-            fontWeight: 900, 
-            letterSpacing: "-0.05em",
-            lineHeight: "0.9"
-          }}>
-            ESTABLISH<br/>CONTACT
-          </h2>
-          <p style={{ color: colors.textSecondary, marginTop: "24px", fontSize: "18px" }}>
-            Open for collaboration on high-impact engineering challenges.
-          </p>
+    <section id="contact" style={{ background: "#000000", padding: "160px 24px" }}>
+      <div style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center" }}>
+        <p style={{ fontSize: "18px", fontWeight: 400, color: "#ffffff", marginBottom: "16px" }}>
+          Let's talk
+        </p>
+        <p style={{ fontSize: "14px", color: "#444444", marginBottom: "32px" }}>
+          sdas22@gmail.com
+        </p>
+        <div style={{ display: "flex", justifyContent: "center", gap: "32px" }}>
+          {[
+            { label: "GitHub", href: "https://github.com/Das-rebel" },
+            { label: "LinkedIn", href: "https://linkedin.com/in/subholearns" },
+          ].map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.2em", color: "#333333", textDecoration: "none", transition: "color 200ms" }}
+            >
+              {link.label}
+            </a>
+          ))}
         </div>
-
-        <form style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "12px", fontWeight: 800, textTransform: "uppercase", color: colors.textMuted }}>Name</label>
-              <input 
-                type="text" 
-                style={{ 
-                  background: "transparent", 
-                  border: "none", 
-                  borderBottom: `1px solid ${colors.border}`, 
-                  padding: "8px 0", 
-                  color: colors.textPrimary, 
-                  fontSize: "18px", 
-                  outline: "none" 
-                }} 
-              />
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "12px", fontWeight: 800, textTransform: "uppercase", color: colors.textMuted }}>Email</label>
-              <input 
-                type="email" 
-                style={{ 
-                  background: "transparent", 
-                  border: "none", 
-                  borderBottom: `1px solid ${colors.border}`, 
-                  padding: "8px 0", 
-                  color: colors.textPrimary, 
-                  fontSize: "18px", 
-                  outline: "none" 
-                }} 
-              />
-            </div>
-          </div>
-          
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <label style={{ fontSize: "12px", fontWeight: 800, textTransform: "uppercase", color: colors.textMuted }}>Message</label>
-            <textarea 
-              rows={4}
-              style={{ 
-                background: "transparent", 
-                border: "none", 
-                borderBottom: `1px solid ${colors.border}`, 
-                padding: "8px 0", 
-                color: colors.textPrimary, 
-                fontSize: "18px", 
-                outline: "none",
-                resize: "none"
-              }} 
-            />
-          </div>
-
-          <motion.button 
-            whileHover={{ background: colors.textPrimary, color: colors.background }}
-            style={{ 
-              background: "transparent", 
-              color: colors.textPrimary, 
-              border: `2px solid ${colors.border}`, 
-              padding: "20px", 
-              fontSize: "16px", 
-              fontWeight: 900, 
-              textTransform: "uppercase", 
-              cursor: "pointer",
-              transition: "all 0.2s ease"
-            }}
-          >
-            Send Transmission
-          </motion.button>
-        </form>
       </div>
     </section>
   );
