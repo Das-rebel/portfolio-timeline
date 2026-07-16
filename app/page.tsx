@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { timelineData } from "@/lib/timeline-data";
 import { motion } from "framer-motion";
 import {
@@ -199,7 +199,7 @@ function CompanyLogo({ company, color }: { company: string; color: string }) {
   );
 }
 
-/* ─── TOOLTIP COMPONENT ─────────────────── */
+/* ─── KB TOOLTIP ────────────────────────── */
 function KBTooltip({ bullets, color }: { bullets: string[]; color: string }) {
   return (
     <div style={{
@@ -233,7 +233,6 @@ function KBTooltip({ bullets, color }: { bullets: string[]; color: string }) {
 
 /* ─── COMPONENTS ────────────────────────── */
 function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boolean; onToggle: () => void }) {
-  // Get ALL resume bullets from timelineData for this company
   const kbBullets = timelineData.find(t => t.company === job.company)?.bullets || job.highlights;
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -243,10 +242,10 @@ function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boole
         border: `1px solid ${job.color}25`,
         borderLeft: `3px solid ${job.color}`,
         borderRadius: "6px",
+        position: "relative",
         marginBottom: "10px",
         background: "#faf3ea",
         transition: "box-shadow 0.25s ease",
-        position: "relative",
       }}
       onMouseEnter={e => {
         (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${job.color}18`;
