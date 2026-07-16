@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   trailingSlash: true,
+  basePath: "/portfolio-timeline",
+  assetPrefix: "/portfolio-timeline/",
 };
 
 export default nextConfig;
