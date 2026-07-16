@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { timelineData } from "@/lib/timeline-data";
+import { timelineData, caseStudies } from "@/lib/timeline-data";
 import { motion } from "framer-motion";
 import {
   IconBrandGithub, IconBrandLinkedin, IconMail, IconExternalLink,
@@ -127,8 +127,8 @@ function CompanyLogo({ company, color }: { company: string; color: string }) {
   // Map company names to logo files
   const logoMap: Record<string, string> = {
     "GROWW": "/logos/groww.png",
-    "Axis Bank": "/logos/axisbank.png",
-    "ICICI Bank": "/logos/icici.png",
+    "Axis Bank": "/logos/axisbank.jpg",
+    "ICICI Bank": "/logos/icici.jpg",
     "Aditya Birla Capital": "/logos/adityabilacapital.png",
     "NIRO": "/logos/niro.png",
     "Tenovia Solutions": "/logos/tenovia.png",
@@ -593,6 +593,47 @@ export default function Page() {
                 </div>
                 <p style={{ fontFamily: "'DM Serif Text',serif", fontSize: "12px", lineHeight: "1.5", color: "#1f1c14" }}>
                   {card.text}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── IMPACT ── */}
+      <section id="impact" style={{ background: "#faf3ea", padding: "80px 24px", borderTop: "1px solid #d3c9b3", borderBottom: "1px solid #d3c9b3" }}>
+        <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "48px" }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c44a47", display: "inline-block", flexShrink: 0 }} />
+            <h2 style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: "10px", letterSpacing: "0.22em", color: "#837964", textTransform: "uppercase", fontWeight: 500 }}>
+              Impact
+            </h2>
+            <div style={{ flex: 1, height: "1px", background: "#d3c9b3" }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
+            {caseStudies.map((cs, i) => (
+              <motion.div
+                key={cs.company}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                style={{
+                  padding: "24px",
+                  background: "#fff",
+                  border: "1px solid #d3c9b3",
+                  borderTop: `3px solid ${i === 0 ? "#c44a47" : i === 1 ? "#1a6b3a" : "#d4af37"}`,
+                  borderRadius: "6px",
+                }}
+              >
+                <div style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: "9px", color: "#837964", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "12px" }}>
+                  {cs.company}
+                </div>
+                <div style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 700, color: "#1f1c14", marginBottom: "8px", lineHeight: 1.1 }}>
+                  {cs.impactMetric}
+                </div>
+                <p style={{ fontFamily: "'DM Serif Text',serif", fontSize: "13px", color: "#837964", lineHeight: 1.5 }}>
+                  {cs.outcome}
                 </p>
               </motion.div>
             ))}
