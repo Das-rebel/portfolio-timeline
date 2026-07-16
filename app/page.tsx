@@ -245,13 +245,15 @@ function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boole
         position: "relative",
         marginBottom: "10px",
         background: "#faf3ea",
-        transition: "box-shadow 0.25s ease",
+        transition: "transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease",
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLElement).style.boxShadow = `0 4px 20px ${job.color}18`;
+        (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
+        (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 24px ${job.color}20`;
         setShowTooltip(true);
       }}
       onMouseLeave={e => {
+        (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
         (e.currentTarget as HTMLElement).style.boxShadow = "none";
         setShowTooltip(false);
       }}
@@ -623,7 +625,7 @@ export default function Page() {
                 href={p.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ x: 2 }}
+                whileHover={{ y: -4, x: 0 }}
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
@@ -641,7 +643,7 @@ export default function Page() {
                 onMouseEnter={e => {
                   (e.currentTarget as HTMLElement).style.borderColor = "#c44a4740";
                   (e.currentTarget as HTMLElement).style.background = "#fff";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(31,28,20,0.08)";
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(31,28,20,0.1)";
                 }}
                 onMouseLeave={e => {
                   (e.currentTarget as HTMLElement).style.borderColor = "#d3c9b3";
