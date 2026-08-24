@@ -148,9 +148,9 @@ function useGitHubRepos() {
 function useVisitorCount() {
   const [count, setCount] = useState<number | null>(null);
   useEffect(() => {
-    fetch("https://abacus.jasoncameron.dev/hit/portfolio-timeline-dasrebel")
-      .then(r => r.text())
-      .then(t => setCount(parseInt(t.replace(/\D/g, ""), 10) || null))
+    fetch("https://abacus.jasoncameron.dev/hit/portfolio-timeline/visits")
+      .then(r => r.json())
+      .then(d => setCount(typeof d.value === "number" ? d.value : null))
       .catch(() => {});
   }, []);
   return count;
