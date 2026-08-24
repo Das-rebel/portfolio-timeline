@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { timelineData, caseStudies } from "@/lib/timeline-data";
 import { motion } from "framer-motion";
 import {
@@ -101,18 +101,60 @@ const JOBS = [
 
 const PROJECTS = [
   {
-    name: "OmniClaw", desc: "Universal AI orchestration across Alexa, WhatsApp, Telegram, and browser automation.",
-    stack: ["Python", "LLM Routing", "Agent Orchestration"], url: "https://github.com/Das-rebel/omniclaw", stars: "240+", status: "Active",
+    name: "A3M Router", repo: "Das-rebel/a3m-router",
+    desc: "Best-in-class open-source LLM router across 80+ providers with Evolution-inspired routing: EXP3 diversity, MVT rate-limit rotation, optimal-defense verification. Top-ranked on RouterArena (96.77% accuracy).",
+    stack: ["Go", "Python", "MCTS Routing"], fallbackStars: 15, fallbackLang: "Go", status: "Active",
+    topics: ["llm-routing", "mcts", "multi-provider"], demoUrl: "https://das-rebel.github.io/routerarena-benchmark/",
   },
   {
-    name: "ChuckleNet", desc: "ML humor recognition using XLM-R backbone for standup comedy analysis.",
-    stack: ["Python", "XLM-R", "Transformers"], url: "https://github.com/Das-rebel/chucklenet", stars: "85+", status: "Research",
+    name: "OmniClaw", repo: "Das-rebel/omniclaw",
+    desc: "Multi-provider LLM router (8+ models) with WhatsApp, Telegram, Alexa integrations, Hindi/Bengali support, and 18 MCP browser tools. Production-deployed on GCP.",
+    stack: ["Node.js", "Python", "Agent Orchestration"], fallbackStars: 2, fallbackLang: "TypeScript", status: "Active",
+    topics: ["whatsapp", "alexa", "browser-automation"], demoUrl: null,
   },
   {
-    name: "Growth Workflow OS", desc: "AI-enabled growth workflow system with RAG and knowledge management.",
-    stack: ["Python", "Automation", "RAG"], url: "https://github.com/Das-rebel/growth-workflow-os", stars: "120+", status: "Active",
+    name: "ChuckleNet", repo: "Das-rebel/chucklenet",
+    desc: "ML audience-intelligence: BERT/XLM-R fine-tuned on 120K+ samples for laughter & humor detection. 98.78% Val F1, cross-cultural benchmarks. ACL/EMNLP 2026 research track.",
+    stack: ["Python", "XLM-R", "PyTorch"], fallbackStars: 1, fallbackLang: "Python", status: "Research",
+    topics: ["xlm-r", "humor-detection", "transformers"], demoUrl: null,
   },
 ];
+
+/* ─── LIVE GITHUB DATA ──────────────────── */
+function useGitHubRepos() {
+  const [data, setData] = useState<Record<string, { stars: number; lang: string | null; pushed: string | null }>>({});
+  useEffect(() => {
+    let alive = true;
+    Promise.all(
+      PROJECTS.map(p =>
+        fetch(`https://api.github.com/repos/${p.repo}`, { headers: { Accept: "application/vnd.github.v3+json" } })
+          .then(r => (r.ok ? r.json() : null))
+          .catch(() => null)
+      )
+    ).then(results => {
+      if (!alive) return;
+      const map: typeof data = {};
+      results.forEach((r: any, i) => {
+        if (r) map[PROJECTS[i].name] = { stars: r.stargazers_count, lang: r.language, pushed: r.pushed_at?.slice(0, 10) ?? null };
+      });
+      setData(map);
+    });
+    return () => { alive = false; };
+  }, []);
+  return data;
+}
+
+/* ─── VISITOR COUNTER (Abacus — free, no signup) ── */
+function useVisitorCount() {
+  const [count, setCount] = useState<number | null>(null);
+  useEffect(() => {
+    fetch("https://abacus.jasoncameron.dev/hit/portfolio-timeline-dasrebel")
+      .then(r => r.text())
+      .then(t => setCount(parseInt(t.replace(/\D/g, ""), 10) || null))
+      .catch(() => {});
+  }, []);
+  return count;
+}
 
 const STACK = [
   { cat: "Languages", items: "Python · Go · Rust · TypeScript · SQL" },
@@ -232,9 +274,10 @@ function KBTooltip({ bullets, color }: { bullets: string[]; color: string }) {
 }
 
 /* ─── COMPONENTS ────────────────────────── */
-function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boolean; onToggle: () => void }) {
+function JobCard({ job, isOpen, onToggle, onHoverOpen, onHoverClose }: { job: typeof JOBS[0]; isOpen: boolean; onToggle: () => void; onHoverOpen: () => void; onHoverClose: () => void }) {
   const kbBullets = timelineData.find(t => t.company === job.company)?.bullets || job.highlights;
   const [showTooltip, setShowTooltip] = useState(false);
+  const expanded = isOpen || showTooltip;
 
   return (
     <div
@@ -251,14 +294,16 @@ function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boole
         (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
         (e.currentTarget as HTMLElement).style.boxShadow = `0 8px 24px ${job.color}20`;
         setShowTooltip(true);
+        onHoverOpen();
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
         (e.currentTarget as HTMLElement).style.boxShadow = "none";
         setShowTooltip(false);
+        onHoverClose();
       }}
     >
-      {showTooltip && <KBTooltip bullets={kbBullets} color={job.color} />}
+      {showTooltip && !expanded && <KBTooltip bullets={kbBullets} color={job.color} />}
       {/* Header — always visible, clickable */}
       <button
         onClick={onToggle}
@@ -302,10 +347,10 @@ function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boole
       {/* Expandable content — using maxHeight for smooth animation */}
       <div
         style={{
-          maxHeight: isOpen ? "500px" : "0",
+          maxHeight: expanded ? "600px" : "0",
           overflow: "hidden",
           transition: "max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
-          opacity: isOpen ? 1 : 0,
+          opacity: expanded ? 1 : 0,
         }}
       >
         <div style={{ padding: "0 16px 14px", borderTop: `1px solid ${job.color}18` }}>
@@ -339,9 +384,78 @@ function JobCard({ job, isOpen, onToggle }: { job: typeof JOBS[0]; isOpen: boole
   );
 }
 
+/* ─── REPO CARDS (live GitHub data, old-design style) ── */
+function RepoCard({ p, live }: { p: typeof PROJECTS[0]; live?: { stars: number; lang: string | null; pushed: string | null } }) {
+  const [hovered, setHovered] = useState(false);
+  const stars = live?.stars ?? p.fallbackStars;
+  const lang = live?.lang ?? p.fallbackLang;
+  return (
+    <motion.a
+      href={p.demoUrl ?? `https://github.com/${p.repo}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      animate={{ y: hovered ? -4 : 0 }}
+      transition={{ duration: 0.2 }}
+      style={{
+        display: "block",
+        padding: "16px 18px",
+        border: "1px solid #d3c9b3",
+        borderTop: "3px solid #1a6b3a",
+        borderRadius: "6px",
+        background: hovered ? "#fff" : "#faf3ea",
+        boxShadow: hovered ? "0 8px 24px rgba(31,28,20,0.12)" : "none",
+        textDecoration: "none",
+        transition: "border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 700, fontSize: "17px", color: "#1f1c14" }}>
+            {p.name}
+          </span>
+          <span style={{
+            fontFamily: "'IBM Plex Mono',monospace", fontSize: "8px",
+            color: "#1a6b3a", background: "rgba(26,107,58,0.1)", border: "1px solid rgba(26,107,58,0.25)",
+            padding: "2px 6px", borderRadius: "10px", letterSpacing: "0.1em",
+          }}>
+            {p.status}
+          </span>
+        </div>
+        <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: "9px", color: "#837964", flexShrink: 0 }}>
+          ★ {stars} · {lang}
+          {live?.pushed && <span style={{ color: "#d3c9b3", margin: "0 4px" }}>·</span>}
+          {live?.pushed && <span title="last push">{live.pushed}</span>}
+        </span>
+      </div>
+      <p style={{ fontFamily: "'DM Serif Text',serif", fontSize: "12px", lineHeight: "1.5", color: "#837964", marginBottom: "8px" }}>
+        {p.desc}
+      </p>
+      <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+        {[...p.stack, ...p.topics].map((t, i, arr) => (
+          <span key={t} style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: "9px", color: "#837964" }}>
+            {t}{i < arr.length - 1 && <span style={{ color: "#d3c9b3", margin: "0 2px" }}>·</span>}
+          </span>
+        ))}
+      </div>
+    </motion.a>
+  );
+}
+
+function RepoCards() {
+  const live = useGitHubRepos();
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      {PROJECTS.map(p => <RepoCard key={p.name} p={p} live={live[p.name]} />)}
+    </div>
+  );
+}
+
 /* ─── PAGE ──────────────────────────────── */
 export default function Page() {
   const [openJob, setOpenJob] = useState<string | null>("NIRO");
+  const visits = useVisitorCount();
 
   return (
     <div style={{
@@ -547,6 +661,8 @@ export default function Page() {
               job={job}
               isOpen={openJob === job.company}
               onToggle={() => setOpenJob(openJob === job.company ? null : job.company)}
+              onHoverOpen={() => setOpenJob(job.company)}
+              onHoverClose={() => setOpenJob(null)}
             />
           ))}
         </div>
@@ -575,7 +691,7 @@ export default function Page() {
               { icon: "📈", label: "Growth", text: "Scaled products from $5M to $44M ARR across 5 companies", color: "#c44a47" },
               { icon: "🤖", label: "AI Systems", text: "Built autonomous research loops and multi-agent orchestrators", color: "#e07d52" },
               { icon: "🏗️", label: "Platforms", text: "Embedded lending, partner APIs, and neo-banking platforms", color: "#3b82f6" },
-              { icon: "⭐", label: "Open Source", text: "OmniClaw, ChuckleNet, Growth Workflow OS on GitHub", color: "#1a6b3a" },
+              { icon: "⭐", label: "Open Source", text: "A3M Router, OmniClaw, ChuckleNet on GitHub", color: "#1a6b3a" },
             ].map(card => (
               <motion.div
                 key={card.label}
@@ -659,77 +775,7 @@ export default function Page() {
             <div style={{ flex: 1, height: "1px", background: "#d3c9b3" }} />
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {PROJECTS.map(p => (
-              <motion.a
-                key={p.name}
-                href={p.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ y: -4, x: 0 }}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  padding: "14px 16px",
-                  border: "1px solid #d3c9b3",
-                  borderRadius: "6px",
-                  background: "#faf3ea",
-                  textDecoration: "none",
-                  gap: "16px",
-                  transition: "all 0.2s ease",
-                  position: "relative",
-                  overflow: "hidden",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "#c44a4740";
-                  (e.currentTarget as HTMLElement).style.background = "#fff";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(31,28,20,0.1)";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.borderColor = "#d3c9b3";
-                  (e.currentTarget as HTMLElement).style.background = "#faf3ea";
-                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
-                }}
-              >
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                    <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 700, fontSize: "16px", color: "#1f1c14" }}>
-                      {p.name}
-                    </span>
-                    <span style={{
-                      fontFamily: "'IBM Plex Mono',monospace",
-                      fontSize: "8px",
-                      color: "#1a6b3a",
-                      background: "rgba(26,107,58,0.1)",
-                      border: "1px solid rgba(26,107,58,0.25)",
-                      padding: "2px 6px",
-                      borderRadius: "10px",
-                      letterSpacing: "0.1em",
-                    }}>
-                      {p.status}
-                    </span>
-                    <span style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: "9px", color: "#837964", marginLeft: "auto" }}>
-                      ⭐ {p.stars}
-                    </span>
-                  </div>
-                  <p style={{ fontFamily: "'DM Serif Text',serif", fontSize: "12px", lineHeight: "1.45", color: "#837964", marginBottom: "6px" }}>
-                    {p.desc}
-                  </p>
-                  <div style={{ display: "flex", gap: "4px" }}>
-                    {p.stack.map((t, i) => (
-                      <span key={t} style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: "9px", color: "#837964" }}>
-                        {t}{i < p.stack.length - 1 && <span style={{ color: "#d3c9b3", margin: "0 2px" }}>·</span>}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ color: "#837964", flexShrink: 0, alignSelf: "center" }}>
-                  <IconExternalLink size={14} />
-                </div>
-              </motion.a>
-            ))}
-          </div>
+          <RepoCards />
         </div>
       </section>
 
@@ -794,6 +840,11 @@ export default function Page() {
             </p>
             <p style={{ fontFamily: "'IBM Plex Mono',monospace", fontSize: "9px", color: "#837964", letterSpacing: "0.14em", textTransform: "uppercase" }}>
               Software Engineer · Bangalore · 2026
+              {visits !== null && (
+                <span style={{ marginLeft: "12px", textTransform: "none", letterSpacing: "0.08em", opacity: 0.7 }}>
+                  ◉ {visits.toLocaleString()} visits
+                </span>
+              )}
             </p>
           </div>
           <a
