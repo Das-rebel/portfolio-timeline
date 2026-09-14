@@ -1,0 +1,54 @@
+{
+  "name": "umami-analytics",
+  "region": "blr",
+  "databases": [
+    {
+      "engine": "PG",
+      "name": "umami-db",
+      "size": "db-s-dev-database",
+      "version": "15"
+    }
+  ],
+  "services": [
+    {
+      "name": "umami",
+      "github": {
+        "repo": "umami-software/umami",
+        "branch": "master",
+        "deploy_on_push": false,
+        "dockerfile_path": "Dockerfile.postgresql"
+      },
+      "environment_slug": "node-js",
+      "http_port": 3000,
+      "instance_count": 1,
+      "instance_size_slug": "basic-xxs",
+      "health_check": {
+        "path": "/api/health"
+      },
+      "environment_variables": [
+        {
+          "key": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "key": "DATABASE_TYPE",
+          "value": "postgresql"
+        },
+        {
+          "key": "APP_SECRET",
+          "value": "${UmamiAppSecret}"
+        },
+        {
+          "key": "DATABASE_URL",
+          "value": "${umami-db.DATABASE_URL}"
+        }
+      ],
+      "databases": [
+        {
+          "engine": "PG",
+          "name": "umami-db"
+        }
+      ]
+    }
+  ]
+}
