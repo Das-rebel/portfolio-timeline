@@ -1,5 +1,13 @@
 import { ThemeProvider } from "../context/ThemeContext";
+import UmamiAnalytics from "@/components/UmamiAnalytics";
 import "./globals.css";
+
+// Umami configuration — set these environment variables
+// NEXT_PUBLIC_UMAMI_URL = your Umami instance URL (e.g., https://umami.example.com)
+// NEXT_PUBLIC_UMAMI_WEBSITE_ID = the website ID from Umami dashboard
+
+const UMAMI_URL = process.env.NEXT_PUBLIC_UMAMI_URL || "";
+const UMAMI_WEBSITE_ID = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID || "";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +26,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           {children}
         </ThemeProvider>
+        {/* Umami Analytics — only renders when configured */}
+        {UMAMI_URL && UMAMI_WEBSITE_ID && (
+          <UmamiAnalytics umamiUrl={UMAMI_URL} websiteId={UMAMI_WEBSITE_ID} />
+        )}
       </body>
     </html>
   );
